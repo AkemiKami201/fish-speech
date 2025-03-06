@@ -13,9 +13,9 @@ import numpy as np
 import ormsgpack
 import soundfile as sf
 
-from .schema import (
+from fish_speech.utils.schema import (
+    ServeChatRequest,
     ServeMessage,
-    ServeRequest,
     ServeTextPart,
     ServeVQGANDecodeRequest,
     ServeVQGANEncodeRequest,
@@ -163,7 +163,7 @@ class FishE2EAgent:
         else:
             user_codes = None
 
-        request = ServeRequest(
+        request = ServeChatRequest(
             messages=prev_messages
             + (
                 [

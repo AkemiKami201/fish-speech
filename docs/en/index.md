@@ -118,7 +118,7 @@ apt install build-essential \
 pip3 install -e .[stable]
 ```
 
-## macos setup
+## MacOS setup
 
 If you want to perform inference on MPS, please add the `--device mps` flag.
 Please refer to [this PR](https://github.com/fishaudio/fish-speech/pull/461#issuecomment-2284277772) for a comparison of inference speeds.
@@ -127,6 +127,8 @@ Please refer to [this PR](https://github.com/fishaudio/fish-speech/pull/461#issu
     The `compile` option is not officially supported on Apple Silicon devices, so there is no guarantee that inference speed will improve.
 
 ```bash
+# install dependencies
+brew install portaudio
 # create a python 3.10 virtual environment, you can also use virtualenv
 conda create -n fish-speech python=3.10
 conda activate fish-speech
@@ -185,7 +187,7 @@ pip install -e .[stable]
 4. Configure environment variables and access WebUI
 
     In the terminal inside the docker container, enter `export GRADIO_SERVER_NAME="0.0.0.0"` to allow external access to the gradio service inside docker.
-    Then in the terminal inside the docker container, enter `python tools/webui.py` to start the WebUI service.
+    Then in the terminal inside the docker container, enter `python tools/run_webui.py` to start the WebUI service.
 
     If you're using WSL or MacOS, visit [http://localhost:7860](http://localhost:7860) to open the WebUI interface.
 

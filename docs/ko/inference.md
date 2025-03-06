@@ -10,21 +10,24 @@
     3. 새로운 텍스트를 입력하면, 모델이 해당하는 시맨틱 토큰을 생성합니다.
     4. 생성된 시맨틱 토큰을 VITS / VQGAN에 입력하여 음성을 디코딩하고 생성합니다.
 
-## 명령줄 추론
-
+## 모델 다운로드
 필요한 `vqgan` 및 `llama` 모델을 Hugging Face 리포지토리에서 다운로드하세요.
 
 ```bash
 huggingface-cli download fishaudio/fish-speech-1.5 --local-dir checkpoints/fish-speech-1.5
 ```
 
+## 명령줄 추론
 ### 1. 음성에서 프롬프트 생성:
 
 !!! note
     모델이 음색을 무작위로 선택하도록 하려면 이 단계를 건너뛸 수 있습니다.
 
+!!! warning "향후 버전 경고"
+    원래 경로(tools/vqgan/infernce.py)에서 접근할 수 있는 인터페이스는 유지했지만, 이 인터페이스는 향후 몇몇 버전에서 삭제될 수 있습니다. 가능한 한 빨리 코드를 변경하십시오.
+
 ```bash
-python tools/vqgan/inference.py \
+python fish_speech/models/vqgan/inference.py \
     -i "paimon.wav" \
     --checkpoint-path "checkpoints/fish-speech-1.5/firefly-gan-vq-fsq-8x1024-21hz-generator.pth"
 ```
@@ -33,8 +36,11 @@ python tools/vqgan/inference.py \
 
 ### 2. 텍스트에서 시맨틱 토큰 생성:
 
+!!! warning "향후 버전 경고"
+    원래 경로(tools/llama/generate.py)에서 접근할 수 있는 인터페이스는 유지했지만, 이 인터페이스는 향후 몇몇 버전에서 삭제될 수 있습니다. 가능한 한 빨리 코드를 변경하십시오.
+
 ```bash
-python tools/llama/generate.py \
+python fish_speech/models/text2semantic/inference.py \
     --text "변환할 텍스트" \
     --prompt-text "참고할 텍스트" \
     --prompt-tokens "fake.npy" \
@@ -56,8 +62,11 @@ python tools/llama/generate.py \
 
 #### VQGAN 디코더
 
+!!! warning "향후 버전 경고"
+    원래 경로(tools/vqgan/infernce.py)에서 접근할 수 있는 인터페이스는 유지했지만, 이 인터페이스는 향후 몇몇 버전에서 삭제될 수 있습니다. 가능한 한 빨리 코드를 변경하십시오.
+
 ```bash
-python tools/vqgan/inference.py \
+python fish_speech/models/vqgan/inference.py \
     -i "codes_0.npy" \
     --checkpoint-path "checkpoints/fish-speech-1.5/firefly-gan-vq-fsq-8x1024-21hz-generator.pth"
 ```
@@ -67,7 +76,7 @@ python tools/vqgan/inference.py \
 추론을 위한 HTTP API를 제공하고 있습니다. 아래의 명령어로 서버를 시작할 수 있습니다:
 
 ```bash
-python -m tools.api \
+python -m tools.api_server \
     --listen 0.0.0.0:8080 \
     --llama-checkpoint-path "checkpoints/fish-speech-1.5" \
     --decoder-checkpoint-path "checkpoints/fish-speech-1.5/firefly-gan-vq-fsq-8x1024-21hz-generator.pth" \
@@ -78,10 +87,10 @@ python -m tools.api \
 
 이후, http://127.0.0.1:8080/ 에서 API를 확인하고 테스트할 수 있습니다.
 
-아래는 `tools/post_api.py`를 사용하여 요청을 보내는 예시입니다.
+아래는 `tools/api_client.py`를 사용하여 요청을 보내는 예시입니다.
 
 ```bash
-python -m tools.post_api \
+python -m tools.api_client \
     --text "입력할 텍스트" \
     --reference_audio "참고 음성 경로" \
     --reference_text "참고 음성의 텍스트 내용" \
@@ -93,7 +102,7 @@ python -m tools.post_api \
 다음 예시는 여러 개의 참고 음성 경로와 텍스트를 한꺼번에 사용할 수 있음을 보여줍니다. 명령에서 공백으로 구분하여 입력합니다.
 
 ```bash
-python -m tools.post_api \
+python -m tools.api_client \
     --text "입력할 텍스트" \
     --reference_audio "참고 음성 경로1" "참고 음성 경로2" \
     --reference_text "참고 음성 텍스트1" "참고 음성 텍스트2"\
@@ -107,7 +116,7 @@ python -m tools.post_api \
 `--reference_audio`와 `--reference_text` 대신에 `--reference_id`(하나만 사용 가능)를 사용할 수 있습니다. 프로젝트 루트 디렉토리에 `references/<your reference_id>` 폴더를 만들어 해당 음성과 주석 텍스트를 넣어야 합니다. 참고 음성은 최대 90초까지 지원됩니다.
 
 !!! info 
-    제공되는 파라미터는 `python -m tools.post_api -h`를 사용하여 확인할 수 있습니다.
+    제공되는 파라미터는 `python -m tools.api_client -h`를 사용하여 확인할 수 있습니다.
 
 ## GUI 추론 
 [클라이언트 다운로드](https://github.com/AnyaCoder/fish-speech-gui/releases)
@@ -117,7 +126,7 @@ python -m tools.post_api \
 다음 명령으로 WebUI를 시작할 수 있습니다:
 
 ```bash
-python -m tools.webui \
+python -m tools.run_webui \
     --llama-checkpoint-path "checkpoints/fish-speech-1.5" \
     --decoder-checkpoint-path "checkpoints/fish-speech-1.5/firefly-gan-vq-fsq-8x1024-21hz-generator.pth" \
     --decoder-config-name firefly_gan_vq

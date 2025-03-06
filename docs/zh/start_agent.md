@@ -49,7 +49,7 @@ pip install -e .[stable]
 你需要使用以下指令来构建 fish-agent
 
 ```bash
-python -m tools.api --llama-checkpoint-path checkpoints/fish-agent-v0.1-3b/ --mode agent --compile
+python -m tools.api_server --llama-checkpoint-path checkpoints/fish-agent-v0.1-3b/ --mode agent --compile
 ```
 
 `--compile`只能在小于 3.12 版本的 Python 使用，这个功能可以极大程度上提高生成速度。
@@ -76,7 +76,7 @@ python -m tools.e2e_webui
 
 ## Performance
 
-在我们的测试环境下， 4060 laptop GPU 只能刚刚运行该模型，只有大概 8 tokens/s。 4090 CPU 可以在编译后达到 95 tokens/s，我们推荐使用至少 4080 以上级别的 GPU 来达到较好体验。
+在我们的测试环境下， 4060 laptop GPU 只能刚刚运行该模型，只有大概 8 tokens/s。 4090 GPU 可以在编译后达到 95 tokens/s，我们推荐使用至少 4080 以上级别的 GPU 来达到较好体验。
 
 # About Agent
 
